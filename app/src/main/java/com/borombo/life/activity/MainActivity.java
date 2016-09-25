@@ -7,6 +7,7 @@ import com.borombo.life.R;
 import com.borombo.life.data.LifeContainer;
 import com.borombo.life.model.Post;
 import com.borombo.life.service.LifeService;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.List;
 
@@ -20,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AVLoadingIndicatorView loader = (AVLoadingIndicatorView) findViewById(R.id.loader);
+        loader.show();
 
         Call<List<Post>> operationsService = LifeService.service.listPosts();
 
