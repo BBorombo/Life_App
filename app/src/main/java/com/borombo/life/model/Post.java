@@ -1,5 +1,6 @@
 package com.borombo.life.model;
 
+import com.borombo.life.data.LifeContainer;
 import com.borombo.life.service.LifeService;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class Post {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 _author = response.body();
+                LifeContainer.getInstance().addUser(_author);
             }
             @Override
             public void onFailure(Call<User> call, Throwable t) {}
@@ -63,6 +65,7 @@ public class Post {
             @Override
             public void onResponse(Call<Media> call, Response<Media> response) {
                 cover = response.body();
+                LifeContainer.getInstance().addMedia(cover);
             }
             @Override
             public void onFailure(Call<Media> call, Throwable t) {}
@@ -74,12 +77,14 @@ public class Post {
      */
     private void setCategorieRessource(){
 
-        for (int categorie: categories) {
+        for (final int categorie: categories) {
             Call<Categorie> categorieCall = LifeService.service.getCategorie(categorie);
             categorieCall.enqueue(new Callback<Categorie>() {
                 @Override
                 public void onResponse(Call<Categorie> call, Response<Categorie> response) {
-                    _categories.add(response.body());
+                    Categorie c = response.body();
+                    _categories.add(c);
+                    LifeContainer.getInstance().addCategorie(c);
                 }
                 @Override
                 public void onFailure(Call<Categorie> call, Throwable t) {}
@@ -98,7 +103,9 @@ public class Post {
             tagCall.enqueue(new Callback<Tag>() {
                 @Override
                 public void onResponse(Call<Tag> call, Response<Tag> response) {
-                    _tags.add(response.body());
+                    Tag t = response.body();
+                    _tags.add(t);
+                    LifeContainer.getInstance().addTag(t);
                 }
                 @Override
                 public void onFailure(Call<Tag> call, Throwable t) {}

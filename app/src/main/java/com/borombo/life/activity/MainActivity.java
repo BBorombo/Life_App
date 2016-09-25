@@ -1,9 +1,10 @@
 package com.borombo.life.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.borombo.life.R;
+import com.borombo.life.data.LifeContainer;
 import com.borombo.life.model.Post;
 import com.borombo.life.service.LifeService;
 
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 //Récupère chaque objets des ressources de chaque posts
                 for (Post post : list) {
                     post.initRessources();
+                    LifeContainer.getInstance().addPost(post);
                 }
             }
             @Override
