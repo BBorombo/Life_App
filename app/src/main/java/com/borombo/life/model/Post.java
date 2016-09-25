@@ -3,11 +3,10 @@ package com.borombo.life.model;
 import com.borombo.life.data.LifeContainer;
 import com.borombo.life.service.LifeService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Erwan on 25/09/2016.
@@ -33,7 +32,7 @@ public class Post {
     /**
      * Fonction qui permllet d'initialiser les objets des ressources du post
      */
-    public void initRessources(){
+    public void initRessources() throws IOException {
         setAuthorRessource();
         setMediaRessource();
         setCategorieRessource();
@@ -43,75 +42,45 @@ public class Post {
     /**
      * Récupère l'objet de l'auteur du post
      */
-    private void setAuthorRessource(){
+    private void setAuthorRessource() throws IOException {
         Call<User> userCall = LifeService.service.getAuthor(this.author);
-        userCall.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                _author = response.body();
-                LifeContainer.getInstance().addUser(_author);
-            }
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {}
-        });
+        _author = userCall.execute().body();
+        LifeContainer.getInstance().addUser(_author);
     }
 
     /**
      * Récupère l'image du media du poste si elle existe
      */
-    private void setMediaRessource(){
+    private void setMediaRessource() throws IOException {
         Call<Media> mediaCall = LifeService.service.getMedia(this.featured_media);
-        mediaCall.enqueue(new Callback<Media>() {
-            @Override
-            public void onResponse(Call<Media> call, Response<Media> response) {
-                cover = response.body();
-                LifeContainer.getInstance().addMedia(cover);
-            }
-            @Override
-            public void onFailure(Call<Media> call, Throwable t) {}
-        });
+        cover = mediaCall.execute().body();
+        LifeContainer.getInstance().addMedia(cover);
     }
 
     /**
      * Récupère les catégories du posts
      */
-    private void setCategorieRessource(){
+    private void setCategorieRessource() throws IOException {
 
         for (final int categorie: categories) {
             Call<Categorie> categorieCall = LifeService.service.getCategorie(categorie);
-            categorieCall.enqueue(new Callback<Categorie>() {
-                @Override
-                public void onResponse(Call<Categorie> call, Response<Categorie> response) {
-                    Categorie c = response.body();
-                    _categories.add(c);
-                    LifeContainer.getInstance().addCategorie(c);
-                }
-                @Override
-                public void onFailure(Call<Categorie> call, Throwable t) {}
-            });
+            Categorie c = categorieCall.execute().body();
+            _categories.add(c);
+            LifeContainer.getInstance().addCategorie(c);
         }
-
     }
 
     /**
      * Récupère les tages du post
      */
-    private void setTagRessource(){
+    private void setTagRessource() throws IOException {
 
         for (int tag:tags) {
             Call<Tag> tagCall = LifeService.service.getTag(tag);
-            tagCall.enqueue(new Callback<Tag>() {
-                @Override
-                public void onResponse(Call<Tag> call, Response<Tag> response) {
-                    Tag t = response.body();
-                    _tags.add(t);
-                    LifeContainer.getInstance().addTag(t);
-                }
-                @Override
-                public void onFailure(Call<Tag> call, Throwable t) {}
-            });
+            Tag t = tagCall.execute().body();
+            _tags.add(t);
+            LifeContainer.getInstance().addTag(t);
         }
-
     }
 
     public int getId() {

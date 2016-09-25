@@ -1,5 +1,6 @@
 package com.borombo.life.activity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -9,37 +10,49 @@ import com.borombo.life.model.Post;
 import com.borombo.life.service.LifeService;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
+    AVLoadingIndicatorView loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loader = (AVLoadingIndicatorView) findViewById(R.id.loader);
+        new getData().execute();
+    }
 
-        AVLoadingIndicatorView loader = (AVLoadingIndicatorView) findViewById(R.id.loader);
-        loader.show();
+    public class getData extends AsyncTask<Void, Void, Void>{
 
-        Call<List<Post>> operationsService = LifeService.service.listPosts();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loader.show();
+        }
 
-        operationsService.enqueue(new Callback<List<Post>>() {
-            @Override
-            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
-                List<Post> list = response.body();
-                //Récupère chaque objets des ressources de chaque posts
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Call<List<Post>> operationsService = LifeService.service.listPosts();
+            try {
+                List<Post> list = operationsService.execute().body();
                 for (Post post : list) {
                     post.initRessources();
                     LifeContainer.getInstance().addPost(post);
                 }
-            }
-            @Override
-            public void onFailure(Call<List<Post>> call, Throwable t) {}
-        });
+            } catch (IOException e) {e.printStackTrace();}
+            return null;
+        }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            loader.hide();
+        }
     }
+
 }
